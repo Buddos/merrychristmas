@@ -963,53 +963,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Add a Christmas countdown (optional)
-    function updateChristmasCountdown() {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        let christmas = new Date(currentYear, 11, 25); // December 25
-        
-        // If Christmas has passed this year, use next year
-        if (now > christmas) {
-            christmas = new Date(currentYear + 1, 11, 25);
-        }
-        
-        const diff = christmas - now;
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        
-        // Add countdown to page if not already present
-        if (days >= 0 && !document.getElementById('countdown')) {
-            const countdownEl = document.createElement('div');
-            countdownEl.id = 'countdown';
-            countdownEl.innerHTML = `🎅 ${days} days until Christmas!`;
-            countdownEl.style.cssText = `
-                position: fixed;
-                bottom: 70px;
-                right: 20px;
-                background: rgba(255, 255, 255, 0.1);
-                padding: 8px 16px;
-                border-radius: 20px;
-                font-size: 14px;
-                backdrop-filter: blur(5px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                z-index: 1000;
-                transition: all 0.3s ease;
-            `;
-            
-            // Add hover effect to countdown
-            countdownEl.addEventListener('mouseenter', () => {
-                countdownEl.style.background = 'rgba(255, 255, 255, 0.2)';
-                countdownEl.style.transform = 'translateY(-2px)';
-            });
-            
-            countdownEl.addEventListener('mouseleave', () => {
-                countdownEl.style.background = 'rgba(255, 255, 255, 0.1)';
-                countdownEl.style.transform = 'translateY(0)';
-            });
-            
-            document.body.appendChild(countdownEl);
-        }
-    }
     
     // Initialize countdown
     updateChristmasCountdown();
