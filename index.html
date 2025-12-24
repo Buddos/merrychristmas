@@ -6,7 +6,16 @@
   <title>Merry Christmas</title>
   <meta property="og:title" content="Merry Christmas!" />
   <meta property="og:description" content="Wishing you joy, peace, and love this Christmas." />
-  <link rel="stylesheet" href="./css/styles.css">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1574482620811-1aa16ffe3c82?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=630&q=80" />
+  <meta property="og:url" content="https://your-site.vercel.app" />
+  <meta name="twitter:card" content="summary_large_image" />
+  
+  <!-- FIXED CSS PATH: Removed ./ prefix -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎄</text></svg>">
+  
   <style>
     /* Inline helper styles for decorative elements & modals */
     :root{--card-bg:rgba(255,255,255,0.06);--accent:#ffd7d7;--btn:#0b7a75}
@@ -40,13 +49,13 @@
   <canvas id="fireworks"></canvas>
 
   <main class="card" id="greeting" role="main" aria-labelledby="title">
-    <h1 id="title"> Bonnie Wishes you Merry Christmas!</h1>
-    <p class="lead" id="message">Wishing you joy, peace, and love this Christmas.</p>
+    <h1 id="title">🎄 Bonnie Wishes you Merry Christmas! 🎅</h1>
+    <p class="lead" id="message">Wishing you joy, peace, and love this Christmas season. May your holidays be filled with warmth and cheer!</p>
 
     <div class="actions" role="toolbar" aria-label="Actions">
-      <button id="copy">Copy Message</button>
-      <button id="share" class="ghost">Share</button>
-      <button id="celebrate">Celebrate 🎆</button>
+      <button id="copy">📋 Copy Message</button>
+      <button id="share" class="ghost">📤 Share</button>
+      <button id="celebrate">🎆 Celebrate!</button>
     </div>
 
     <div class="icons" aria-hidden="false" title="Click to open">
@@ -72,13 +81,20 @@
     </div>
 
     <p style="opacity:.8;font-size:.9rem;margin-top:10px">Click the icons to open pop-ups. Use Celebrate to trigger fireworks.</p>
+    
+    <!-- Added Christmas music toggle -->
+    <div style="margin-top:20px;opacity:0.7">
+      <button id="musicToggle" style="background:transparent;border:1px solid rgba(255,255,255,0.3);padding:6px 12px;font-size:0.8rem">
+        🎵 Toggle Christmas Music
+      </button>
+    </div>
   </main>
 
   <!-- Tree Modal -->
   <div class="modal-backdrop" id="treeModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="treeTitle">
     <div class="modal" role="document">
       <button class="close" data-close>&times;</button>
-      <h2 id="treeTitle">Christmas Tree</h2>
+      <h2 id="treeTitle">🎄 Christmas Tree</h2>
       <div class="content">
         <p>May your days be merry and bright. Enjoy this little tree decoration and a warm wish!</p>
         <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
@@ -88,7 +104,7 @@
             <rect x="28" y="52" width="8" height="12" fill="#8b5f3b"/>
           </svg>
           <div>
-            <p style="margin:0">Decorate, celebrate, and stay cozy!</p>
+            <p style="margin:0">Decorate, celebrate, and stay cozy! The Christmas tree symbolizes everlasting life and hope.</p>
           </div>
         </div>
       </div>
@@ -99,95 +115,147 @@
   <div class="modal-backdrop" id="starModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="starTitle">
     <div class="modal" role="document">
       <button class="close" data-close>&times;</button>
-      <h2 id="starTitle">Shining Star</h2>
+      <h2 id="starTitle">⭐ Shining Star</h2>
       <div class="content">
-        <p>May every star guide you to joy and new blessings this season.</p>
-        <div style="margin-top:8px">⭐ ✨ 🌟</div>
+        <p>May every star guide you to joy and new blessings this season. The star represents guidance and hope.</p>
+        <div style="margin-top:8px;font-size:24px">⭐ ✨ 🌟</div>
+        <p style="margin-top:12px;font-size:0.9rem;opacity:0.9">Just as the Star of Bethlehem guided the wise men, may stars guide you to happiness.</p>
       </div>
     </div>
   </div>
 
   <script>
-    // Minimal interactive behaviors: copy/share, modals, fireworks
-    // Copy
+    // Enhanced interactive behaviors
+    console.log('🎄 Merry Christmas! Website loaded successfully.');
+    
+    // Copy function with better feedback
     const copyBtn = document.getElementById('copy');
     copyBtn.addEventListener('click', () => {
       const text = document.getElementById('title').textContent + " — " + document.getElementById('message').textContent;
-      if (navigator.clipboard) navigator.clipboard.writeText(text).then(()=> alert('Copied!'));
-      else { alert(text); }
-    });
-
-    // Share
-    const shareBtn = document.getElementById('share');
-    shareBtn.addEventListener('click', async () => {
-      const text = document.getElementById('title').textContent + " — " + document.getElementById('message').textContent;
-      if (navigator.share) {
-        try { await navigator.share({ title: 'Merry Christmas', text }); }
-        catch (e) { /* user canceled */ }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(()=> {
+          // Visual feedback
+          copyBtn.innerHTML = '✅ Copied!';
+          setTimeout(() => {
+            copyBtn.innerHTML = '📋 Copy Message';
+          }, 2000);
+        });
       } else {
-        alert('Share not supported. Use copy instead.');
+        prompt('Copy this message:', text);
       }
     });
 
-    // Modals
+    // Share function with improved fallback
+    const shareBtn = document.getElementById('share');
+    shareBtn.addEventListener('click', async () => {
+      const text = document.getElementById('title').textContent + " — " + document.getElementById('message').textContent;
+      const url = window.location.href;
+      
+      if (navigator.share) {
+        try {
+          await navigator.share({ 
+            title: 'Merry Christmas Greetings', 
+            text: text,
+            url: url
+          });
+        } catch (e) {
+          console.log('Share cancelled');
+        }
+      } else {
+        // Fallback share
+        shareBtn.innerHTML = '📧 Copied Link!';
+        navigator.clipboard.writeText(url + '\n\n' + text);
+        setTimeout(() => {
+          shareBtn.innerHTML = '📤 Share';
+        }, 2000);
+      }
+    });
+
+    // Enhanced Modals
     function openModal(id) {
       const el = document.getElementById(id);
       el.style.display = 'grid';
       el.setAttribute('aria-hidden','false');
-      // set focus to close button
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
+      
+      // Set focus to close button
       const btn = el.querySelector('[data-close]');
       if (btn) btn.focus();
     }
+    
     function closeModal(el) {
       el.style.display = 'none';
       el.setAttribute('aria-hidden','true');
+      document.body.style.overflow = 'auto'; // Restore scrolling
     }
+    
+    // Modal event listeners
     document.getElementById('treeIcon').addEventListener('click', ()=> openModal('treeModal'));
     document.getElementById('starIcon').addEventListener('click', ()=> openModal('starModal'));
+    
+    // Close buttons
     document.querySelectorAll('.modal-backdrop [data-close]').forEach(b=>b.addEventListener('click', (e)=> {
       closeModal(e.target.closest('.modal-backdrop'));
     }));
-    // close on backdrop click
+    
+    // Close on backdrop click
     document.querySelectorAll('.modal-backdrop').forEach(back=> back.addEventListener('click', (e)=>{
       if (e.target === back) closeModal(back);
     }));
+    
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-backdrop[aria-hidden="false"]').forEach(modal => {
+          closeModal(modal);
+        });
+      }
+    });
 
-    // Fireworks canvas (lightweight)
+    // Fireworks canvas (enhanced)
     (function(){
       const canvas = document.getElementById('fireworks');
       const ctx = canvas.getContext('2d');
       let w = canvas.width = innerWidth;
       let h = canvas.height = innerHeight;
-      window.addEventListener('resize', ()=>{ w=canvas.width=innerWidth; h=canvas.height=innerHeight; });
+      
+      window.addEventListener('resize', () => { 
+        w = canvas.width = innerWidth; 
+        h = canvas.height = innerHeight; 
+      });
 
       const particles = [];
-      function launch(x,y){
-        const hue = Math.random()*360;
-        for(let i=0;i<60;i++){
+      function launch(x, y, color = null){
+        const hue = color || Math.random() * 360;
+        for(let i = 0; i < 60; i++){
           particles.push({
-            x,y,
-            vx: (Math.random()-0.5)*6,
-            vy: (Math.random()-0.5)*6,
-            life: 60 + Math.random()*40,
+            x, y,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6,
+            life: 60 + Math.random() * 40,
             hue,
-            size: 1 + Math.random()*3
+            size: 1 + Math.random() * 3
           });
         }
       }
 
       function render(){
-        ctx.fillStyle = 'rgba(0,0,0,0.12)';
-        ctx.fillRect(0,0,w,h);
-        for (let i=particles.length-1;i>=0;i--){
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+        ctx.fillRect(0, 0, w, h);
+        
+        for (let i = particles.length - 1; i >= 0; i--){
           const p = particles[i];
-          p.x += p.vx; p.y += p.vy;
+          p.x += p.vx; 
+          p.y += p.vy;
           p.vy += 0.02;
           p.life--;
-          if (p.life <= 0) particles.splice(i,1);
-          else {
+          
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+          } else {
             ctx.beginPath();
-            ctx.fillStyle = 'hsla('+p.hue+',90%,'+(50 - p.life*0.2)+'%,'+(p.life/80)+')';
-            ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+            ctx.fillStyle = `hsla(${p.hue}, 90%, ${50 - p.life * 0.2}%, ${p.life / 80})`;
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             ctx.fill();
           }
         }
@@ -195,30 +263,117 @@
       }
       render();
 
-      // trigger on celebrate click and allow random on double-click background
-      document.getElementById('celebrate').addEventListener('click', (e)=>{
-        // launch a few bursts across top
-        for (let i=0;i<5;i++){
-          const x = innerWidth * Math.random();
-          const y = innerHeight * 0.2 + Math.random()*innerHeight*0.3;
-          setTimeout(()=> launch(x,y), i*120);
+      // Celebrate button with multiple bursts
+      document.getElementById('celebrate').addEventListener('click', (e) => {
+        // Christmas colors: red, green, gold, blue
+        const colors = [0, 120, 60, 240]; // red, green, gold, blue
+        
+        for (let i = 0; i < 8; i++){
+          setTimeout(() => {
+            const x = innerWidth * (0.1 + Math.random() * 0.8);
+            const y = innerHeight * (0.1 + Math.random() * 0.4);
+            launch(x, y, colors[Math.floor(Math.random() * colors.length)]);
+          }, i * 100);
         }
+        
+        // Button feedback
+        e.target.innerHTML = '🎇 Celebrating!';
+        setTimeout(() => {
+          e.target.innerHTML = '🎆 Celebrate!';
+        }, 1500);
       });
 
-      // also allow user to click to spawn fireworks
-      document.addEventListener('click', (e)=>{
-        if (e.target.closest('.card')) return; // ignore clicks inside the card except celebrate
+      // Click to spawn fireworks
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.card') && !e.target.closest('#celebrate')) return;
         launch(e.clientX, e.clientY);
       });
     })();
 
-    // small accessibility: allow Enter key on icons
-    ['treeIcon','starIcon'].forEach(id=>{
+    // Accessibility: allow Enter/Space on icons
+    ['treeIcon', 'starIcon'].forEach(id => {
       const el = document.getElementById(id);
-      el.addEventListener('keydown', (ev)=>{
-        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); el.click(); }
-      });
+      if (el) {
+        el.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' || ev.key === ' ') { 
+            ev.preventDefault(); 
+            el.click(); 
+          }
+        });
+      }
     });
+
+    // Christmas music toggle
+    const musicToggle = document.getElementById('musicToggle');
+    let audio = null;
+    let isPlaying = false;
+    
+    if (musicToggle) {
+      musicToggle.addEventListener('click', () => {
+        if (!audio) {
+          // Create audio element with Christmas music
+          audio = new Audio('https://assets.mixkit.co/music/preview/mixkit-jingle-bells-311.mp3');
+          audio.loop = true;
+          audio.volume = 0.3;
+        }
+        
+        if (isPlaying) {
+          audio.pause();
+          musicToggle.innerHTML = '🎵 Play Christmas Music';
+          isPlaying = false;
+        } else {
+          audio.play().then(() => {
+            musicToggle.innerHTML = '🔇 Pause Music';
+            isPlaying = true;
+          }).catch(err => {
+            console.log('Audio play failed:', err);
+            musicToggle.innerHTML = '🔇 Music Unavailable';
+          });
+        }
+      });
+    }
+
+    // Snowfall effect
+    function createSnow() {
+      const snowContainer = document.createElement('div');
+      snowContainer.style.position = 'fixed';
+      snowContainer.style.top = '0';
+      snowContainer.style.left = '0';
+      snowContainer.style.width = '100%';
+      snowContainer.style.height = '100%';
+      snowContainer.style.pointerEvents = 'none';
+      snowContainer.style.zIndex = '2';
+      document.body.appendChild(snowContainer);
+
+      for (let i = 0; i < 50; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.innerHTML = '❄️';
+        snowflake.style.position = 'absolute';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.top = '-20px';
+        snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+        snowflake.style.opacity = Math.random() * 0.5 + 0.3;
+        snowflake.style.animation = `fall ${Math.random() * 5 + 5}s linear infinite`;
+        snowflake.style.animationDelay = Math.random() * 5 + 's';
+        
+        // Add CSS for falling animation
+        if (!document.querySelector('#snow-style')) {
+          const style = document.createElement('style');
+          style.id = 'snow-style';
+          style.textContent = `
+            @keyframes fall {
+              to { transform: translateY(100vh) rotate(360deg); }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+        
+        snowContainer.appendChild(snowflake);
+      }
+    }
+
+    // Start snowfall after page loads
+    window.addEventListener('load', createSnow);
   </script>
 </body>
 </html>
