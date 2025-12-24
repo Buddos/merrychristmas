@@ -10,38 +10,40 @@
   <meta property="og:url" content="https://your-site.vercel.app" />
   <meta name="twitter:card" content="summary_large_image" />
   
-  <!-- FIXED CSS PATH: Removed ./ prefix -->
+  <!-- CSS file - your excellent CSS is here -->
   <link rel="stylesheet" href="css/styles.css">
   
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎄</text></svg>">
   
   <style>
-    /* Inline helper styles for decorative elements & modals */
-    :root{--card-bg:rgba(255,255,255,0.06);--accent:#ffd7d7;--btn:#0b7a75}
-    body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,Arial;background:linear-gradient(#08192b,#0b3b56);color:#fff}
-    .card{background:var(--card-bg);padding:28px;border-radius:12px;text-align:center;max-width:760px;position:relative;z-index:5}
-    h1{color:var(--accent);margin:0 0 8px 0}
-    p.lead{margin:0 0 16px 0;color:#fff9}
-    .actions{display:flex;gap:10px;justify-content:center;margin-top:12px}
-    button{background:var(--btn);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
-    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.12)}
-    .icons{display:flex;gap:12px;justify-content:center;margin-top:16px}
-    .icon{width:56px;height:56px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,0.03);cursor:pointer;transition:transform .16s}
-    .icon:active{transform:scale(.96)}
-    /* Stars twinkle */
-    .star{color:#fff9;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4));animation:twinkle 2s infinite}
-    @keyframes twinkle{0%,100%{opacity:.6;transform:scale(.96)}50%{opacity:1;transform:scale(1.06)}}
-    /* Modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;place-items:center;z-index:30}
-    .modal{background:#081827;padding:20px;border-radius:12px;max-width:520px;color:#fff;text-align:left;box-shadow:0 10px 30px rgba(0,0,0,.6)}
-    .modal h2{margin:0 0 8px 0;color:var(--accent)}
-    .modal .close{position:absolute;right:12px;top:10px;background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer}
-    .modal .content{margin-top:8px}
-    /* fireworks canvas */
-    canvas#fireworks{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:3}
-    /* small responsive tweaks */
-    @media (max-width:520px){.card{padding:18px}}
+    /* Only keep essential inline styles not in your CSS file */
+    
+    /* Fireworks canvas positioning */
+    canvas#fireworks{
+      position:fixed;
+      left:0;
+      top:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+      z-index:3;
+    }
+    
+    /* Small helper styles */
+    .small {font-size:.9rem; opacity:.85}
+    
+    /* Snowfall animation for JS */
+    @keyframes fall {
+      to { transform: translateY(100vh) rotate(360deg); }
+    }
+    
+    @keyframes celebrate {
+      0%, 100% { transform: translateX(0) scale(1); }
+      25% { transform: translateX(-10px) scale(1.02); }
+      50% { transform: translateX(10px) scale(1.02); }
+      75% { transform: translateX(-5px) scale(1.01); }
+    }
   </style>
 </head>
 <body>
@@ -61,51 +63,38 @@
     <div class="icons" aria-hidden="false" title="Click to open">
       <div class="icon" id="treeIcon" aria-label="Tree popup" role="button" tabindex="0">
         <!-- simple tree svg -->
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" class="star" aria-hidden>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" class="star" aria-hidden="true">
           <path d="M12 2 L8 8 H11 V15 H13 V8 H16 L12 2 Z" fill="#1a9b1a"/>
           <rect x="10" y="16" width="4" height="4" rx="0.5" fill="#8b5f3b"/>
         </svg>
       </div>
 
       <div class="icon" id="starIcon" aria-label="Star popup" role="button" tabindex="0">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" class="star" aria-hidden>
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" class="star" aria-hidden="true">
           <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.965 1.433 8.318L12 18.896 4.631 23.589l1.433-8.318L0 11.306l8.332-1.151z" fill="#ffd166"/>
         </svg>
       </div>
 
-      <div class="icon" id="sparkle" aria-hidden>
+      <div class="icon" id="sparkle" aria-label="Sparkle" role="button" tabindex="0" aria-hidden="true">
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
           <path d="M12 2l1.8 4.5L18 8l-4.2 1.5L12 14l-1.8-4.5L6 8l4.2-1.5z" fill="#fff"/>
         </svg>
       </div>
     </div>
 
-    <p style="opacity:.8;font-size:.9rem;margin-top:10px">Click the icons to open pop-ups. Use Celebrate to trigger fireworks.</p>
-    
-    <!-- Static server audio: place feliz.mp3 in docs/media/ or ./media/ relative to this file -->
-    <div style="margin-top:12px;">
-      <audio id="felizPlayer" src="./media/feliz.mp3" preload="none" controls style="display:none"></audio>
-      <button id="playFeliz" class="ghost" type="button" style="margin-top:8px;padding:6px 10px;border-radius:6px">▶️ Play "Feliz"</button>
-      <span id="felizStatus" class="small" style="margin-left:8px;opacity:.85"></span>
-    </div>
+    <p class="small" style="margin-top:10px">Click the icons to open pop-ups. Use Celebrate to trigger fireworks.</p>
 
-    <!-- Added Christmas music toggle (external fallback) -->
-    <div style="margin-top:20px;opacity:0.7">
-      <button id="musicToggle" style="background:transparent;border:1px solid rgba(255,255,255,0.3);padding:6px 12px;font-size:0.8rem">
-        🎵 Toggle Christmas Music
-      </button>
-    </div>
   </main>
 
   <!-- Tree Modal -->
   <div class="modal-backdrop" id="treeModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="treeTitle">
     <div class="modal" role="document">
-      <button class="close" data-close>&times;</button>
+      <button class="close" data-close aria-label="Close modal">&times;</button>
       <h2 id="treeTitle">🎄 Christmas Tree</h2>
       <div class="content">
         <p>May your days be merry and bright. Enjoy this little tree decoration and a warm wish!</p>
         <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
-          <svg width="80" height="100" viewBox="0 0 64 80" aria-hidden>
+          <svg width="80" height="100" viewBox="0 0 64 80" aria-hidden="true">
             <polygon points="32,6 10,36 54,36" fill="#0e8a2d"/>
             <polygon points="32,20 6,52 58,52" fill="#0faa3a"/>
             <rect x="28" y="52" width="8" height="12" fill="#8b5f3b"/>
@@ -121,7 +110,7 @@
   <!-- Star Modal -->
   <div class="modal-backdrop" id="starModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="starTitle">
     <div class="modal" role="document">
-      <button class="close" data-close>&times;</button>
+      <button class="close" data-close aria-label="Close modal">&times;</button>
       <h2 id="starTitle">⭐ Shining Star</h2>
       <div class="content">
         <p>May every star guide you to joy and new blessings this season. The star represents guidance and hope.</p>
@@ -131,260 +120,20 @@
     </div>
   </div>
 
+  <!-- Basic fallback JavaScript -->
   <script>
-    // Enhanced interactive behaviors
-    console.log('🎄 Merry Christmas! Website loaded successfully.');
-    
-    // Copy function with better feedback
-    const copyBtn = document.getElementById('copy');
-    copyBtn.addEventListener('click', () => {
-      const text = document.getElementById('title').textContent + " — " + document.getElementById('message').textContent;
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(()=> {
-          copyBtn.innerHTML = '✅ Copied!';
-          setTimeout(() => { copyBtn.innerHTML = '📋 Copy Message'; }, 2000);
-        });
-      } else {
-        prompt('Copy this message:', text);
-      }
-    });
-
-    // Share function with improved fallback
-    const shareBtn = document.getElementById('share');
-    shareBtn.addEventListener('click', async () => {
-      const text = document.getElementById('title').textContent + " — " + document.getElementById('message').textContent;
-      const url = window.location.href;
+    // Basic functionality to ensure modals work
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🎄 Christmas website loading...');
       
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: 'Merry Christmas Greetings', text: text, url: url });
-        } catch (e) { console.log('Share cancelled'); }
-      } else {
-        shareBtn.innerHTML = '📧 Copied Link!';
-        if (navigator.clipboard) navigator.clipboard.writeText(url + '\n\n' + text);
-        setTimeout(() => { shareBtn.innerHTML = '📤 Share'; }, 2000);
-      }
+      // Set aria-hidden correctly for modals
+      document.querySelectorAll('.modal-backdrop').forEach(modal => {
+        modal.setAttribute('aria-hidden', 'true');
+      });
     });
-
-    // Enhanced Modals
-    function openModal(id) {
-      const el = document.getElementById(id);
-      el.style.display = 'grid';
-      el.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden'; // Prevent scrolling
-      const btn = el.querySelector('[data-close]');
-      if (btn) btn.focus();
-    }
-    function closeModal(el) {
-      el.style.display = 'none';
-      el.setAttribute('aria-hidden','true');
-      document.body.style.overflow = 'auto';
-    }
-    document.getElementById('treeIcon').addEventListener('click', ()=> openModal('treeModal'));
-    document.getElementById('starIcon').addEventListener('click', ()=> openModal('starModal'));
-    document.querySelectorAll('.modal-backdrop [data-close]').forEach(b=>b.addEventListener('click', (e)=> {
-      closeModal(e.target.closest('.modal-backdrop'));
-    }));
-    document.querySelectorAll('.modal-backdrop').forEach(back=> back.addEventListener('click', (e)=>{
-      if (e.target === back) closeModal(back);
-    }));
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-backdrop[aria-hidden="false"]').forEach(modal => { closeModal(modal); });
-      }
-    });
-
-    // Fireworks canvas (enhanced)
-    (function(){
-      const canvas = document.getElementById('fireworks');
-      const ctx = canvas.getContext('2d');
-      let w = canvas.width = innerWidth;
-      let h = canvas.height = innerHeight;
-      window.addEventListener('resize', () => { w = canvas.width = innerWidth; h = canvas.height = innerHeight; });
-
-      const particles = [];
-      function launch(x, y, color = null){
-        const hue = color || Math.random() * 360;
-        for(let i = 0; i < 60; i++){
-          particles.push({
-            x, y,
-            vx: (Math.random() - 0.5) * 6,
-            vy: (Math.random() - 0.5) * 6,
-            life: 60 + Math.random() * 40,
-            hue,
-            size: 1 + Math.random() * 3
-          });
-        }
-      }
-
-      function render(){
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
-        ctx.fillRect(0, 0, w, h);
-        for (let i = particles.length - 1; i >= 0; i--){
-          const p = particles[i];
-          p.x += p.vx; p.y += p.vy; p.vy += 0.02; p.life--;
-          if (p.life <= 0) particles.splice(i, 1);
-          else {
-            ctx.beginPath();
-            ctx.fillStyle = `hsla(${p.hue}, 90%, ${50 - p.life * 0.2}%, ${p.life / 80})`;
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-        requestAnimationFrame(render);
-      }
-      render();
-
-      document.getElementById('celebrate').addEventListener('click', (e) => {
-        const colors = [0, 120, 60, 240];
-        for (let i = 0; i < 8; i++){
-          setTimeout(() => {
-            const x = innerWidth * (0.1 + Math.random() * 0.8);
-            const y = innerHeight * (0.1 + Math.random() * 0.4);
-            launch(x, y, colors[Math.floor(Math.random() * colors.length)]);
-          }, i * 100);
-        }
-        e.target.innerHTML = '🎇 Celebrating!';
-        setTimeout(() => { e.target.innerHTML = '🎆 Celebrate!'; }, 1500);
-      });
-
-      // Click to spawn fireworks
-      document.addEventListener('click', (e) => {
-        if (e.target.closest('.card') && !e.target.closest('#celebrate')) return;
-        launch(e.clientX, e.clientY);
-      });
-    })();
-
-    // Accessibility: allow Enter/Space on icons
-    ['treeIcon', 'starIcon'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.addEventListener('keydown', (ev) => {
-          if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); el.click(); }
-        });
-      }
-    });
-
-    // Existing music toggle (external fallback)
-    const musicToggle = document.getElementById('musicToggle');
-    let audio = null;
-    let isPlaying = false;
-    if (musicToggle) {
-      musicToggle.addEventListener('click', () => {
-        if (!audio) {
-          audio = new Audio('https://assets.mixkit.co/music/preview/mixkit-jingle-bells-311.mp3');
-          audio.loop = true;
-          audio.volume = 0.3;
-        }
-        if (isPlaying) {
-          audio.pause();
-          musicToggle.innerHTML = '🎵 Play Christmas Music';
-          isPlaying = false;
-        } else {
-          audio.play().then(() => {
-            musicToggle.innerHTML = '🔇 Pause Music';
-            isPlaying = true;
-          }).catch(err => {
-            console.log('Audio play failed:', err);
-            musicToggle.innerHTML = '🔇 Music Unavailable';
-          });
-        }
-      });
-    }
-
-    // Static local audio control for ./media/feliz.mp3
-    (function(){
-      const playBtn = document.getElementById('playFeliz');
-      const feliz = document.getElementById('felizPlayer');
-      const status = document.getElementById('felizStatus');
-      if (!playBtn || !feliz) return;
-
-      // Show player if file is available
-      function tryShowPlayer() {
-        // Attempt to fetch HEAD to check presence (CORS allowed for same origin)
-        fetch(feliz.src, { method: 'HEAD', cache: 'no-store' })
-          .then(res => {
-            if (res.ok) {
-              feliz.style.display = '';
-              if (status) status.textContent = 'Ready';
-              playBtn.textContent = '▶️ Play "Feliz"';
-            } else {
-              if (status) status.textContent = 'Not found';
-              playBtn.textContent = 'Play (file missing)';
-            }
-          })
-          .catch(() => {
-            // If HEAD fails, still reveal controls — user may have uploaded later
-            // Do not auto-show to avoid noisy errors
-            if (status) status.textContent = '';
-          });
-      }
-      tryShowPlayer();
-
-      let playing = false;
-      playBtn.addEventListener('click', async () => {
-        try {
-          if (feliz.paused) {
-            await feliz.play();
-            playing = true;
-            playBtn.textContent = '⏸ Pause "Feliz"';
-            if (status) status.textContent = 'Playing';
-          } else {
-            feliz.pause();
-            playing = false;
-            playBtn.textContent = '▶️ Play "Feliz"';
-            if (status) status.textContent = 'Paused';
-          }
-        } catch (e) {
-          alert('Playback blocked or file not available. Ensure ./media/feliz.mp3 exists in your deployed site.');
-        }
-      });
-
-      feliz.addEventListener('ended', () => {
-        playing = false;
-        playBtn.textContent = '▶️ Play "Feliz"';
-        if (status) status.textContent = 'Ended';
-      });
-    })();
-
-    // Snowfall effect
-    function createSnow() {
-      const snowContainer = document.createElement('div');
-      snowContainer.style.position = 'fixed';
-      snowContainer.style.top = '0';
-      snowContainer.style.left = '0';
-      snowContainer.style.width = '100%';
-      snowContainer.style.height = '100%';
-      snowContainer.style.pointerEvents = 'none';
-      snowContainer.style.zIndex = '2';
-      document.body.appendChild(snowContainer);
-
-      for (let i = 0; i < 50; i++) {
-        const snowflake = document.createElement('div');
-        snowflake.innerHTML = '❄️';
-        snowflake.style.position = 'absolute';
-        snowflake.style.left = Math.random() * 100 + 'vw';
-        snowflake.style.top = '-20px';
-        snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
-        snowflake.style.opacity = Math.random() * 0.5 + 0.3;
-        snowflake.style.animation = `fall ${Math.random() * 5 + 5}s linear infinite`;
-        snowflake.style.animationDelay = Math.random() * 5 + 's';
-        
-        if (!document.querySelector('#snow-style')) {
-          const style = document.createElement('style');
-          style.id = 'snow-style';
-          style.textContent = `
-            @keyframes fall {
-              to { transform: translateY(100vh) rotate(360deg); }
-            }
-          `;
-          document.head.appendChild(style);
-        }
-        
-        snowContainer.appendChild(snowflake);
-      }
-    }
-    window.addEventListener('load', createSnow);
   </script>
+  
+  <!-- Link to your main.js file with all the features -->
+  <script src="js/main.js"></script>
 </body>
 </html>

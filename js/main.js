@@ -747,6 +747,90 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
+    // ========== FIREWORKS FUNCTIONALITY ==========
+    // This was missing from your main.js - adding it now!
+    (function initializeFireworks() {
+        const canvas = document.getElementById('fireworks');
+        if (!canvas) {
+            console.warn('Fireworks canvas not found');
+            return;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+        
+        window.addEventListener('resize', () => { 
+            w = canvas.width = window.innerWidth; 
+            h = canvas.height = window.innerHeight; 
+        });
+
+        const particles = [];
+        
+        function launch(x, y, color = null) {
+            const hue = color || Math.random() * 360;
+            for(let i = 0; i < 60; i++) {
+                particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 60 + Math.random() * 40,
+                    hue,
+                    size: 1 + Math.random() * 3
+                });
+            }
+        }
+
+        function renderFireworks() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+            ctx.fillRect(0, 0, w, h);
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx; 
+                p.y += p.vy;
+                p.vy += 0.02;
+                p.life--;
+                
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                } else {
+                    ctx.beginPath();
+                    ctx.fillStyle = `hsla(${p.hue}, 90%, ${50 - p.life * 0.2}%, ${p.life / 80})`;
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            requestAnimationFrame(renderFireworks);
+        }
+        
+        renderFireworks();
+
+        // Trigger fireworks on Celebrate button
+        const celebrateBtn = document.getElementById('celebrate');
+        if (celebrateBtn) {
+            celebrateBtn.addEventListener('click', function(e) {
+                const colors = [0, 120, 60, 240]; // Christmas colors
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        const x = window.innerWidth * (0.1 + Math.random() * 0.8);
+                        const y = window.innerHeight * (0.1 + Math.random() * 0.4);
+                        launch(x, y, colors[Math.floor(Math.random() * colors.length)]);
+                    }, i * 100);
+                }
+            });
+        }
+
+        // Click anywhere to spawn fireworks (except on card buttons)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.card') && !e.target.closest('#celebrate')) return;
+            launch(e.clientX, e.clientY);
+        });
+        
+        console.log('🎆 Fireworks initialized!');
+    })();
+    // ========== END FIREWORKS ==========
+    
     // Add CSS for animations
     const style = document.createElement('style');
     style.textContent = `
@@ -952,4 +1036,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         document.removeEventListener('click', autoPlayFelizNavidad);
     }, { once: true });
+    
+    console.log('✨ All Christmas features loaded successfully!');
 });
