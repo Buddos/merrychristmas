@@ -3,26 +3,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Christmas Music Player
     let audio = null;
+    let felizNavidadAudio = null;
     let isPlaying = false;
+    let isFelizNavidadPlaying = false;
     let musicToggleBtn = null;
+    let felizNavidadBtn = null;
     
     // Initialize music
     function initializeMusic() {
-        // Create audio element with Christmas music
+        // Create audio element with Jingle Bells music
         audio = new Audio();
         audio.src = 'https://assets.mixkit.co/music/preview/mixkit-jingle-bells-311.mp3';
         audio.loop = true;
         audio.volume = 0.3;
         audio.preload = 'auto';
         
+        // Create audio element for Feliz Navidad
+        felizNavidadAudio = new Audio();
+        felizNavidadAudio.src = 'https://assets.mixkit.co/music/preview/mixkit-feliz-navidad-319.mp3';
+        felizNavidadAudio.loop = false;
+        felizNavidadAudio.volume = 0.4;
+        felizNavidadAudio.preload = 'auto';
+        
         // Create music toggle button if it doesn't exist
         if (!document.getElementById('musicToggle')) {
             musicToggleBtn = document.createElement('button');
             musicToggleBtn.id = 'musicToggle';
-            musicToggleBtn.innerHTML = '🎵 Play Christmas Music';
+            musicToggleBtn.innerHTML = '🎵 Play Jingle Bells';
             musicToggleBtn.style.cssText = `
                 position: fixed;
-                bottom: 20px;
+                bottom: 70px;
                 left: 20px;
                 background: rgba(255, 255, 255, 0.1);
                 color: white;
@@ -39,11 +49,13 @@ document.addEventListener('DOMContentLoaded', function() {
             musicToggleBtn.addEventListener('mouseenter', () => {
                 musicToggleBtn.style.background = 'rgba(255, 255, 255, 0.2)';
                 musicToggleBtn.style.transform = 'translateY(-2px)';
+                musicToggleBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
             });
             
             musicToggleBtn.addEventListener('mouseleave', () => {
                 musicToggleBtn.style.background = 'rgba(255, 255, 255, 0.1)';
                 musicToggleBtn.style.transform = 'translateY(0)';
+                musicToggleBtn.style.boxShadow = 'none';
             });
             
             document.body.appendChild(musicToggleBtn);
@@ -51,8 +63,56 @@ document.addEventListener('DOMContentLoaded', function() {
             musicToggleBtn = document.getElementById('musicToggle');
         }
         
+        // Create Feliz Navidad button
+        if (!document.getElementById('felizNavidadBtn')) {
+            felizNavidadBtn = document.createElement('button');
+            felizNavidadBtn.id = 'felizNavidadBtn';
+            felizNavidadBtn.innerHTML = '🎶 Feliz Navidad';
+            felizNavidadBtn.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                background: linear-gradient(45deg, #c41e3a, #ff6b6b);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                padding: 10px 20px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: bold;
+                backdrop-filter: blur(5px);
+                z-index: 1000;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(196, 30, 58, 0.3);
+            `;
+            
+            felizNavidadBtn.addEventListener('mouseenter', () => {
+                felizNavidadBtn.style.background = 'linear-gradient(45deg, #ff6b6b, #c41e3a)';
+                felizNavidadBtn.style.transform = 'translateY(-2px) scale(1.05)';
+                felizNavidadBtn.style.boxShadow = '0 6px 20px rgba(196, 30, 58, 0.4)';
+            });
+            
+            felizNavidadBtn.addEventListener('mouseleave', () => {
+                felizNavidadBtn.style.background = 'linear-gradient(45deg, #c41e3a, #ff6b6b)';
+                felizNavidadBtn.style.transform = 'translateY(0) scale(1)';
+                felizNavidadBtn.style.boxShadow = '0 4px 15px rgba(196, 30, 58, 0.3)';
+            });
+            
+            document.body.appendChild(felizNavidadBtn);
+        } else {
+            felizNavidadBtn = document.getElementById('felizNavidadBtn');
+        }
+        
         // Add music toggle functionality
-        musicToggleBtn.addEventListener('click', toggleMusic);
+        musicToggleBtn.addEventListener('click', toggleJingleBells);
+        felizNavidadBtn.addEventListener('click', playFelizNavidad);
+        
+        // When Feliz Navidad ends, update button
+        felizNavidadAudio.addEventListener('ended', () => {
+            isFelizNavidadPlaying = false;
+            felizNavidadBtn.innerHTML = '🎶 Feliz Navidad';
+            felizNavidadBtn.style.background = 'linear-gradient(45deg, #c41e3a, #ff6b6b)';
+        });
         
         // Auto-play music after user interaction (browser policy)
         document.addEventListener('click', enableAutoPlay, { once: true });
@@ -73,32 +133,178 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function toggleMusic() {
+    function toggleJingleBells() {
         if (!audio) return;
         
         if (isPlaying) {
             audio.pause();
-            musicToggleBtn.innerHTML = '🔇 Play Christmas Music';
+            musicToggleBtn.innerHTML = '🎵 Play Jingle Bells';
             isPlaying = false;
-            showNotification('Music paused');
+            showNotification('Jingle Bells paused');
         } else {
+            // Stop Feliz Navidad if playing
+            if (isFelizNavidadPlaying) {
+                felizNavidadAudio.pause();
+                felizNavidadAudio.currentTime = 0;
+                isFelizNavidadPlaying = false;
+                felizNavidadBtn.innerHTML = '🎶 Feliz Navidad';
+                felizNavidadBtn.style.background = 'linear-gradient(45deg, #c41e3a, #ff6b6b)';
+            }
+            
             audio.play().then(() => {
-                musicToggleBtn.innerHTML = '🎵 Now Playing: Jingle Bells';
+                musicToggleBtn.innerHTML = '⏸️ Jingle Bells Playing';
                 isPlaying = true;
-                showNotification('🎶 Christmas music started!');
+                showNotification('🎶 Jingle Bells started!');
                 
                 // Add visual music note animation
-                createMusicNotes(3);
+                createMusicNotes(3, '#ffd700');
             }).catch(err => {
                 console.log('Audio play failed:', err);
-                musicToggleBtn.innerHTML = '🎵 Click to Play Music';
+                musicToggleBtn.innerHTML = '🎵 Click to Play';
                 showNotification('Click the music button to start Christmas music!');
             });
         }
     }
     
+    function playFelizNavidad() {
+        if (!felizNavidadAudio) return;
+        
+        if (isFelizNavidadPlaying) {
+            felizNavidadAudio.pause();
+            felizNavidadAudio.currentTime = 0;
+            isFelizNavidadPlaying = false;
+            felizNavidadBtn.innerHTML = '🎶 Feliz Navidad';
+            felizNavidadBtn.style.background = 'linear-gradient(45deg, #c41e3a, #ff6b6b)';
+            showNotification('Feliz Navidad stopped');
+        } else {
+            // Stop Jingle Bells if playing
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                musicToggleBtn.innerHTML = '🎵 Play Jingle Bells';
+            }
+            
+            felizNavidadAudio.currentTime = 0;
+            felizNavidadAudio.play().then(() => {
+                isFelizNavidadPlaying = true;
+                felizNavidadBtn.innerHTML = '⏸️ Playing Feliz Navidad';
+                felizNavidadBtn.style.background = 'linear-gradient(45deg, #ff0000, #ff6b6b)';
+                
+                showNotification('🎶 ¡Feliz Navidad! 🎄');
+                
+                // Create special Spanish-themed animations
+                createFelizNavidadEffects();
+                createMusicNotes(5, '#c41e3a');
+                
+                // Show Spanish message
+                showSpanishMessage();
+                
+            }).catch(err => {
+                console.log('Feliz Navidad play failed:', err);
+                felizNavidadBtn.innerHTML = '🎶 Click to Play';
+                showNotification('Click to play Feliz Navidad!');
+            });
+        }
+    }
+    
+    function showSpanishMessage() {
+        const messages = [
+            "¡Feliz Navidad y Próspero Año Nuevo!",
+            "¡Que la paz y el amor reinen en tu hogar!",
+            "¡Brindemos por la Navidad! 🥂",
+            "¡Muchas felicidades en esta Navidad!",
+            "¡Que tengas una Navidad llena de alegría!"
+        ];
+        
+        const message = messages[Math.floor(Math.random() * messages.length)];
+        const spanishMsg = document.createElement('div');
+        spanishMsg.className = 'spanish-message';
+        spanishMsg.innerHTML = `🇪🇸 ${message}`;
+        spanishMsg.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(196, 30, 58, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 1001;
+            animation: spanishMessage 3s ease forwards;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        `;
+        
+        document.body.appendChild(spanishMsg);
+        
+        setTimeout(() => {
+            if (spanishMsg.parentNode) {
+                spanishMsg.remove();
+            }
+        }, 3000);
+    }
+    
+    function createFelizNavidadEffects() {
+        // Create Spanish flag colors confetti
+        const spanishColors = ['#c41e3a', '#ffc400', '#c41e3a']; // Red, Yellow, Red
+        
+        for (let i = 0; i < 30; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '12px';
+            confetti.style.height = '8px';
+            confetti.style.backgroundColor = spanishColors[Math.floor(Math.random() * spanishColors.length)];
+            confetti.style.borderRadius = '4px';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-20px';
+            confetti.style.zIndex = '9997';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.opacity = '0.9';
+            
+            const duration = Math.random() * 2 + 2;
+            const delay = Math.random() * 0.5;
+            
+            confetti.style.animation = `
+                fall ${duration}s linear ${delay}s forwards,
+                rotate ${duration}s linear ${delay}s infinite
+            `;
+            
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => {
+                if (confetti.parentNode) {
+                    confetti.remove();
+                }
+            }, (duration + delay) * 1000);
+        }
+        
+        // Create guitar notes
+        for (let i = 0; i < 5; i++) {
+            const guitar = document.createElement('div');
+            guitar.innerHTML = '🎸';
+            guitar.style.position = 'fixed';
+            guitar.style.left = Math.random() * 100 + 'vw';
+            guitar.style.top = '100vh';
+            guitar.style.fontSize = '30px';
+            guitar.style.opacity = '0.8';
+            guitar.style.zIndex = '9996';
+            guitar.style.animation = `guitarFloat ${Math.random() * 3 + 3}s ease-in forwards`;
+            
+            document.body.appendChild(guitar);
+            
+            setTimeout(() => {
+                if (guitar.parentNode) {
+                    guitar.remove();
+                }
+            }, 5000);
+        }
+    }
+    
     // Create floating music notes animation
-    function createMusicNotes(count) {
+    function createMusicNotes(count, color = '#ffd700') {
         const notes = ['♪', '♫', '🎵', '🎶', '🎼'];
         
         for (let i = 0; i < count; i++) {
@@ -112,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
             note.style.zIndex = '9995';
             note.style.pointerEvents = 'none';
             note.style.animation = `floatUp ${Math.random() * 3 + 3}s ease-in forwards`;
-            note.style.color = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff9f1c'][Math.floor(Math.random() * 4)];
+            note.style.color = color;
             
             document.body.appendChild(note);
             
@@ -235,6 +441,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     oscillator.frequency.value = 659.25; // E5
                     oscillator.type = 'sawtooth';
                     break;
+                case 'feliz':
+                    // Spanish guitar-like sound
+                    oscillator.frequency.value = 392; // G4
+                    oscillator.type = 'sine';
+                    break;
                 default:
                     oscillator.frequency.value = 440;
                     oscillator.type = 'sine';
@@ -353,18 +564,13 @@ document.addEventListener('DOMContentLoaded', function() {
             // Play celebration sound
             playCelebrationSound();
             
-            // Start music if not playing
-            if (audio && !isPlaying) {
-                audio.play().then(() => {
-                    isPlaying = true;
-                    if (musicToggleBtn) {
-                        musicToggleBtn.innerHTML = '🎵 Now Playing: Jingle Bells';
-                    }
-                });
+            // Play Feliz Navidad if not already playing
+            if (!isFelizNavidadPlaying && !isPlaying) {
+                felizNavidadBtn.click();
             }
             
             // Create music notes
-            createMusicNotes(10);
+            createMusicNotes(10, '#ff6b6b');
             
             // Reset button after 2 seconds
             setTimeout(() => {
@@ -485,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function() {
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            // Play a Christmas melody (Jingle Bells snippet)
+            // Play a Christmas melody
             oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
             oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
             oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.2);
@@ -592,6 +798,39 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        @keyframes guitarFloat {
+            from { 
+                transform: translateY(0) rotate(0deg); 
+                opacity: 0.8;
+            }
+            to { 
+                transform: translateY(-100vh) rotate(720deg); 
+                opacity: 0;
+            }
+        }
+        
+        @keyframes spanishMessage {
+            0% { 
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            20% { 
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            40% { 
+                transform: translate(-50%, -50%) scale(1);
+            }
+            80% { 
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% { 
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+        }
+        
         @keyframes floatBackground {
             0% { transform: translate(0, 0) scale(1); }
             100% { transform: translate(-50px, -50px) scale(1.1); }
@@ -661,7 +900,7 @@ document.addEventListener('DOMContentLoaded', function() {
             countdownEl.innerHTML = `🎅 ${days} days until Christmas!`;
             countdownEl.style.cssText = `
                 position: fixed;
-                bottom: 20px;
+                bottom: 70px;
                 right: 20px;
                 background: rgba(255, 255, 255, 0.1);
                 padding: 8px 16px;
@@ -698,8 +937,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show welcome message with music suggestion
     setTimeout(() => {
-        if (!isPlaying) {
-            showNotification('🎄 Click the music button for Christmas songs!');
+        if (!isPlaying && !isFelizNavidadPlaying) {
+            showNotification('🎄 Try the Feliz Navidad button for Spanish Christmas music!');
         }
     }, 5000);
+    
+    // Auto-play Feliz Navidad when page loads (after user interaction)
+    document.addEventListener('click', function autoPlayFelizNavidad() {
+        if (!isPlaying && !isFelizNavidadPlaying) {
+            // Play Feliz Navidad on first click anywhere
+            setTimeout(() => {
+                felizNavidadBtn.click();
+            }, 500);
+        }
+        document.removeEventListener('click', autoPlayFelizNavidad);
+    }, { once: true });
 });
