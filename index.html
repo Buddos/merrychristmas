@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Merry Christmas</title>
+  <meta property="og:title" content="Merry Christmas!" />
+  <meta property="og:description" content="Wishing you joy, peace, and love this Christmas." />
+  <link rel="stylesheet" href="./css/styles.css">
+  <style>
+    /* Inline helper styles for decorative elements & modals */
+    :root{--card-bg:rgba(255,255,255,0.06);--accent:#ffd7d7;--btn:#0b7a75}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,Arial;background:linear-gradient(#08192b,#0b3b56);color:#fff}
+    .card{background:var(--card-bg);padding:28px;border-radius:12px;text-align:center;max-width:760px;position:relative;z-index:5}
+    h1{color:var(--accent);margin:0 0 8px 0}
+    p.lead{margin:0 0 16px 0;color:#fff9}
+    .actions{display:flex;gap:10px;justify-content:center;margin-top:12px}
+    button{background:var(--btn);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.12)}
+    .icons{display:flex;gap:12px;justify-content:center;margin-top:16px}
+    .icon{width:56px;height:56px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,0.03);cursor:pointer;transition:transform .16s}
+    .icon:active{transform:scale(.96)}
+    /* Stars twinkle */
+    .star{color:#fff9;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4));animation:twinkle 2s infinite}
+    @keyframes twinkle{0%,100%{opacity:.6;transform:scale(.96)}50%{opacity:1;transform:scale(1.06)}}
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;place-items:center;z-index:30}
+    .modal{background:#081827;padding:20px;border-radius:12px;max-width:520px;color:#fff;text-align:left;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .modal h2{margin:0 0 8px 0;color:var(--accent)}
+    .modal .close{position:absolute;right:12px;top:10px;background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer}
+    .modal .content{margin-top:8px}
+    /* fireworks canvas */
+    canvas#fireworks{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:3}
+    /* small responsive tweaks */
+    @media (max-width:520px){.card{padding:18px}}
+  </style>
+</head>
+<body>
+
+  <canvas id="fireworks"></canvas>
+
+  <main class="card" id="greeting" role="main" aria-labelledby="title">
+    <h1 id="title"> Bonnie Wishes you Merry Christmas!</h1>
+    <p class="lead" id="message">Wishing you joy, peace, and love this Christmas.</p>
+
+    <div class="actions" role="toolbar" aria-label="Actions">
+      <button id="copy">Copy Message</button>
+      <button id="share" class="ghost">Share</button>
+      <button id="celebrate">Celebrate 🎆</button>
+    </div>
+
+    <div class="icons" aria-hidden="false" title="Click to open">
+      <div class="icon" id="treeIcon" aria-label="Tree popup" role="button" tabindex="0">
+        <!-- simple tree svg -->
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" class="star" aria-hidden>
+          <path d="M12 2 L8 8 H11 V15 H13 V8 H16 L12 2 Z" fill="#1a9b1a"/>
+          <rect x="10" y="16" width="4" height="4" rx="0.5" fill="#8b5f3b"/>
+        </svg>
+      </div>
+
+      <div class="icon" id="starIcon" aria-label="Star popup" role="button" tabindex="0">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" class="star" aria-hidden>
+          <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.965 1.433 8.318L12 18.896 4.631 23.589l1.433-8.318L0 11.306l8.332-1.151z" fill="#ffd166"/>
+        </svg>
+      </div>
+
+      <div class="icon" id="sparkle" aria-hidden>
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2l1.8 4.5L18 8l-4.2 1.5L12 14l-1.8-4.5L6 8l4.2-1.5z" fill="#fff"/>
+        </svg>
+      </div>
+    </div>
+
+    <p style="opacity:.8;font-size:.9rem;margin-top:10px">Click the icons to open pop-ups. Use Celebrate to trigger fireworks.</p>
+  </main>
+
+  <!-- Tree Modal -->
+  <div class="modal-backdrop" id="treeModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="treeTitle">
+    <div class="modal" role="document">
+      <button class="close" data-close>&times;</button>
+      <h2 id="treeTitle">Christmas Tree</h2>
+      <div class="content">
+        <p>May your days be merry and bright. Enjoy this little tree decoration and a warm wish!</p>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <svg width="80" height="100" viewBox="0 0 64 80" aria-hidden>
+            <polygon points="32,6 10,36 54,36" fill="#0e8a2d"/>
+            <polygon points="32,20 6,52 58,52" fill="#0faa3a"/>
+            <rect x="28" y="52" width="8" height="12" fill="#8b5f3b"/>
+          </svg>
+          <div>
+            <p style="margin:0">Decorate, celebrate, and stay cozy!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Star Modal -->
+  <div class="modal-backdrop" id="starModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="starTitle">
+    <div class="modal" role="document">
+      <button class="close" data-close>&times;</button>
+      <h2 id="starTitle">Shining Star</h2>
+      <div class="content">
+        <p>May every star guide you to joy and new blessings this season.</p>
+        <div style="margin-top:8px">⭐ ✨ 🌟</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Minimal interactive behaviors: copy/share, modals, fireworks
+    // Copy
+    const copyBtn = document.getElementById('copy');
+    copyBtn.addEventListener('click', () => {
+      const text = document.getElementById('title').textContent + " — " + document.getElementById('message').textContent;
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(()=> alert('Copied!'));
+      else { alert(text); }
+    });
+
+    // Share
+    const shareBtn = document.getElementById('share');
+    shareBtn.addEventListener('click', async () => {
+      const text = document.getElementById('title').textContent + " — " + document.getElementById('message').textContent;
+      if (navigator.share) {
+        try { await navigator.share({ title: 'Merry Christmas', text }); }
+        catch (e) { /* user canceled */ }
+      } else {
+        alert('Share not supported. Use copy instead.');
+      }
+    });
+
+    // Modals
+    function openModal(id) {
+      const el = document.getElementById(id);
+      el.style.display = 'grid';
+      el.setAttribute('aria-hidden','false');
+      // set focus to close button
+      const btn = el.querySelector('[data-close]');
+      if (btn) btn.focus();
+    }
+    function closeModal(el) {
+      el.style.display = 'none';
+      el.setAttribute('aria-hidden','true');
+    }
+    document.getElementById('treeIcon').addEventListener('click', ()=> openModal('treeModal'));
+    document.getElementById('starIcon').addEventListener('click', ()=> openModal('starModal'));
+    document.querySelectorAll('.modal-backdrop [data-close]').forEach(b=>b.addEventListener('click', (e)=> {
+      closeModal(e.target.closest('.modal-backdrop'));
+    }));
+    // close on backdrop click
+    document.querySelectorAll('.modal-backdrop').forEach(back=> back.addEventListener('click', (e)=>{
+      if (e.target === back) closeModal(back);
+    }));
+
+    // Fireworks canvas (lightweight)
+    (function(){
+      const canvas = document.getElementById('fireworks');
+      const ctx = canvas.getContext('2d');
+      let w = canvas.width = innerWidth;
+      let h = canvas.height = innerHeight;
+      window.addEventListener('resize', ()=>{ w=canvas.width=innerWidth; h=canvas.height=innerHeight; });
+
+      const particles = [];
+      function launch(x,y){
+        const hue = Math.random()*360;
+        for(let i=0;i<60;i++){
+          particles.push({
+            x,y,
+            vx: (Math.random()-0.5)*6,
+            vy: (Math.random()-0.5)*6,
+            life: 60 + Math.random()*40,
+            hue,
+            size: 1 + Math.random()*3
+          });
+        }
+      }
+
+      function render(){
+        ctx.fillStyle = 'rgba(0,0,0,0.12)';
+        ctx.fillRect(0,0,w,h);
+        for (let i=particles.length-1;i>=0;i--){
+          const p = particles[i];
+          p.x += p.vx; p.y += p.vy;
+          p.vy += 0.02;
+          p.life--;
+          if (p.life <= 0) particles.splice(i,1);
+          else {
+            ctx.beginPath();
+            ctx.fillStyle = 'hsla('+p.hue+',90%,'+(50 - p.life*0.2)+'%,'+(p.life/80)+')';
+            ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+            ctx.fill();
+          }
+        }
+        requestAnimationFrame(render);
+      }
+      render();
+
+      // trigger on celebrate click and allow random on double-click background
+      document.getElementById('celebrate').addEventListener('click', (e)=>{
+        // launch a few bursts across top
+        for (let i=0;i<5;i++){
+          const x = innerWidth * Math.random();
+          const y = innerHeight * 0.2 + Math.random()*innerHeight*0.3;
+          setTimeout(()=> launch(x,y), i*120);
+        }
+      });
+
+      // also allow user to click to spawn fireworks
+      document.addEventListener('click', (e)=>{
+        if (e.target.closest('.card')) return; // ignore clicks inside the card except celebrate
+        launch(e.clientX, e.clientY);
+      });
+    })();
+
+    // small accessibility: allow Enter key on icons
+    ['treeIcon','starIcon'].forEach(id=>{
+      const el = document.getElementById(id);
+      el.addEventListener('keydown', (ev)=>{
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); el.click(); }
+      });
+    });
+  </script>
+</body>
+</html>
