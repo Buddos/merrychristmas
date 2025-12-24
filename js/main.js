@@ -1,6 +1,132 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🎄 Merry Christmas! Website loaded successfully!');
     
+    // Christmas Music Player
+    let audio = null;
+    let isPlaying = false;
+    let musicToggleBtn = null;
+    
+    // Initialize music
+    function initializeMusic() {
+        // Create audio element with Christmas music
+        audio = new Audio();
+        audio.src = 'https://assets.mixkit.co/music/preview/mixkit-jingle-bells-311.mp3';
+        audio.loop = true;
+        audio.volume = 0.3;
+        audio.preload = 'auto';
+        
+        // Create music toggle button if it doesn't exist
+        if (!document.getElementById('musicToggle')) {
+            musicToggleBtn = document.createElement('button');
+            musicToggleBtn.id = 'musicToggle';
+            musicToggleBtn.innerHTML = '🎵 Play Christmas Music';
+            musicToggleBtn.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                padding: 8px 16px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 14px;
+                backdrop-filter: blur(5px);
+                z-index: 1000;
+                transition: all 0.3s ease;
+            `;
+            
+            musicToggleBtn.addEventListener('mouseenter', () => {
+                musicToggleBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+                musicToggleBtn.style.transform = 'translateY(-2px)';
+            });
+            
+            musicToggleBtn.addEventListener('mouseleave', () => {
+                musicToggleBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+                musicToggleBtn.style.transform = 'translateY(0)';
+            });
+            
+            document.body.appendChild(musicToggleBtn);
+        } else {
+            musicToggleBtn = document.getElementById('musicToggle');
+        }
+        
+        // Add music toggle functionality
+        musicToggleBtn.addEventListener('click', toggleMusic);
+        
+        // Auto-play music after user interaction (browser policy)
+        document.addEventListener('click', enableAutoPlay, { once: true });
+    }
+    
+    function enableAutoPlay() {
+        // Enable autoplay by playing/pausing quickly
+        if (audio && !isPlaying) {
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }).catch(() => {
+                    console.log('Auto-play prevented by browser');
+                });
+            }
+        }
+    }
+    
+    function toggleMusic() {
+        if (!audio) return;
+        
+        if (isPlaying) {
+            audio.pause();
+            musicToggleBtn.innerHTML = '🔇 Play Christmas Music';
+            isPlaying = false;
+            showNotification('Music paused');
+        } else {
+            audio.play().then(() => {
+                musicToggleBtn.innerHTML = '🎵 Now Playing: Jingle Bells';
+                isPlaying = true;
+                showNotification('🎶 Christmas music started!');
+                
+                // Add visual music note animation
+                createMusicNotes(3);
+            }).catch(err => {
+                console.log('Audio play failed:', err);
+                musicToggleBtn.innerHTML = '🎵 Click to Play Music';
+                showNotification('Click the music button to start Christmas music!');
+            });
+        }
+    }
+    
+    // Create floating music notes animation
+    function createMusicNotes(count) {
+        const notes = ['♪', '♫', '🎵', '🎶', '🎼'];
+        
+        for (let i = 0; i < count; i++) {
+            const note = document.createElement('div');
+            note.innerHTML = notes[Math.floor(Math.random() * notes.length)];
+            note.style.position = 'fixed';
+            note.style.left = Math.random() * 100 + 'vw';
+            note.style.top = '100vh';
+            note.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            note.style.opacity = '0.7';
+            note.style.zIndex = '9995';
+            note.style.pointerEvents = 'none';
+            note.style.animation = `floatUp ${Math.random() * 3 + 3}s ease-in forwards`;
+            note.style.color = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff9f1c'][Math.floor(Math.random() * 4)];
+            
+            document.body.appendChild(note);
+            
+            setTimeout(() => {
+                if (note.parentNode) {
+                    note.remove();
+                }
+            }, 5000);
+        }
+    }
+    
+    // Initialize music player
+    initializeMusic();
+    
     // Add click handlers for icons
     const treeIcon = document.getElementById('treeIcon');
     const starIcon = document.getElementById('starIcon');
@@ -8,12 +134,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (treeIcon) {
         treeIcon.addEventListener('click', function() {
             openModal('treeModal');
+            // Play tree sound effect
+            playSoundEffect('tree');
         });
     }
     
     if (starIcon) {
         starIcon.addEventListener('click', function() {
             openModal('starModal');
+            // Play star sound effect
+            playSoundEffect('star');
         });
     }
     
@@ -81,6 +211,45 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Play sound effects
+    function playSoundEffect(type) {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Different sounds for different actions
+            switch(type) {
+                case 'tree':
+                    oscillator.frequency.value = 440; // A4
+                    oscillator.type = 'sine';
+                    break;
+                case 'star':
+                    oscillator.frequency.value = 523.25; // C5
+                    oscillator.type = 'triangle';
+                    break;
+                case 'celebrate':
+                    oscillator.frequency.value = 659.25; // E5
+                    oscillator.type = 'sawtooth';
+                    break;
+                default:
+                    oscillator.frequency.value = 440;
+                    oscillator.type = 'sine';
+            }
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        } catch (e) {
+            console.log('Sound effect failed:', e);
+        }
+    }
+    
     // Copy message button with enhanced feedback
     const copyBtn = document.getElementById('copy');
     if (copyBtn) {
@@ -103,8 +272,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Copy to clipboard
             navigator.clipboard.writeText(fullText)
                 .then(() => {
-                    // Optional: Show a subtle toast notification
                     showNotification('Christmas message copied! 🎅');
+                    playSoundEffect('celebrate');
                 })
                 .catch(err => {
                     console.log('Copy failed:', err);
@@ -136,6 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         url: window.location.href
                     });
                     this.innerHTML = '✅ Shared!';
+                    playSoundEffect('celebrate');
                 } catch (err) {
                     console.log('Share cancelled:', err);
                     this.innerHTML = originalText;
@@ -146,6 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(() => {
                         this.innerHTML = '📋 Link Copied!';
                         showNotification('Link copied to clipboard! Share it manually.');
+                        playSoundEffect('celebrate');
                     })
                     .catch(() => {
                         this.innerHTML = '❌ Failed';
@@ -179,8 +350,21 @@ document.addEventListener('DOMContentLoaded', function() {
             createConfetti(50);
             createTwinklingLights(10);
             
-            // Play celebration sound if available
+            // Play celebration sound
             playCelebrationSound();
+            
+            // Start music if not playing
+            if (audio && !isPlaying) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    if (musicToggleBtn) {
+                        musicToggleBtn.innerHTML = '🎵 Now Playing: Jingle Bells';
+                    }
+                });
+            }
+            
+            // Create music notes
+            createMusicNotes(10);
             
             // Reset button after 2 seconds
             setTimeout(() => {
@@ -244,7 +428,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const duration = Math.random() * 2 + 1;
             const delay = Math.random() * 0.5;
-            const rotation = Math.random() * 720;
             
             confetti.style.animation = `
                 fall ${duration}s linear ${delay}s forwards,
@@ -295,7 +478,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Play celebration sound
     function playCelebrationSound() {
         try {
-            // Create a simple beep sound using Web Audio API
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
@@ -303,14 +485,21 @@ document.addEventListener('DOMContentLoaded', function() {
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.value = 880; // A5 note
+            // Play a Christmas melody (Jingle Bells snippet)
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.2);
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.3);
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.4);
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.5);
+            
             oscillator.type = 'sine';
             
             gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
             
             oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.5);
+            oscillator.stop(audioContext.currentTime + 0.8);
         } catch (e) {
             console.log('Audio not supported:', e);
         }
@@ -392,6 +581,22 @@ document.addEventListener('DOMContentLoaded', function() {
             to { opacity: 0; }
         }
         
+        @keyframes floatUp {
+            from { 
+                transform: translateY(0) rotate(0deg); 
+                opacity: 0.8;
+            }
+            to { 
+                transform: translateY(-100vh) rotate(360deg); 
+                opacity: 0;
+            }
+        }
+        
+        @keyframes floatBackground {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-50px, -50px) scale(1.1); }
+        }
+        
         /* Add subtle background animation */
         body::before {
             content: '';
@@ -407,11 +612,6 @@ document.addEventListener('DOMContentLoaded', function() {
             animation: floatBackground 20s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 1;
-        }
-        
-        @keyframes floatBackground {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-50px, -50px) scale(1.1); }
         }
     `;
     document.head.appendChild(style);
@@ -470,7 +670,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 backdrop-filter: blur(5px);
                 border: 1px solid rgba(255, 255, 255, 0.2);
                 z-index: 1000;
+                transition: all 0.3s ease;
             `;
+            
+            // Add hover effect to countdown
+            countdownEl.addEventListener('mouseenter', () => {
+                countdownEl.style.background = 'rgba(255, 255, 255, 0.2)';
+                countdownEl.style.transform = 'translateY(-2px)';
+            });
+            
+            countdownEl.addEventListener('mouseleave', () => {
+                countdownEl.style.background = 'rgba(255, 255, 255, 0.1)';
+                countdownEl.style.transform = 'translateY(0)';
+            });
             
             document.body.appendChild(countdownEl);
         }
@@ -483,4 +695,11 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         createSnowflakes(5); // Light background snowfall
     }, 3000);
+    
+    // Show welcome message with music suggestion
+    setTimeout(() => {
+        if (!isPlaying) {
+            showNotification('🎄 Click the music button for Christmas songs!');
+        }
+    }, 5000);
 });
